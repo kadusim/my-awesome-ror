@@ -1,8 +1,8 @@
 # Rails Service Objects: A Comprehensive Guide
 
-* [Creating a Service Object](#Creating a Service Object)
-* [Grouping Similar Service Objects for Sanity](#Grouping Similar Service Objects for Sanity)
-* [Service Objects to Handle Database Operations](#Service Objects to Handle Database Operations)
+* [Creating a Service Object](#creating-a-service-object)
+* [Grouping Similar Service Objects for Sanity](#grouping-similar-service-objects-for-sanity)
+* [Service Objects to Handle Database Operations](#service-objects-to-handle-database-operations)
 
 Ruby on Rails ships with everything you need to prototype your application quickly, but when your codebase starts growing, you’ll run into scenarios where the conventional Fat Model, Skinny Controller mantra breaks. When your business logic can’t fit into either a model or a controller, that’s when service objects come in and let us separate every business action into its own Ruby object.
 
@@ -47,16 +47,20 @@ I’m a Rails expert… which I’m told every day that I am, but I have trouble
 What Are Service Objects?
 Service objects are Plain Old Ruby Objects (PORO) that are designed to execute one single action in your domain logic and do it well. Consider the example above: Our method already has the logic to do one single thing, and that is to create a tweet. What if this logic was encapsulated within a single Ruby class that we can instantiate and call a method to? Something like:
 
+````ruby
 tweet_creator = TweetCreator.new(params[:message])
 tweet_creator.send_tweet
+````
 
 
-# Later on in the article, we'll add syntactic sugar and shorten the above to:
+Later on in the article, we'll add syntactic sugar and shorten the above to:
 
 TweetCreator.call(params[:message])
 This is pretty much it; our TweetCreator service object, once created, can be called from anywhere, and it would do this one thing very well.
 
-## Creating a Service Object
+---
+## CREATING A SERVICE OBJECT
+
 First let’s create a new TweetCreator in a new folder called app/services:
 
 $ mkdir app/services && touch app/services/tweet_creator.rb
@@ -154,7 +158,8 @@ class TweetController < ApplicationController
 end
 ````
 
-## Grouping Similar Service Objects for Sanity
+---
+## GROUPING SIMILAR SERVICE OBJECTS FOR SANITY
 
 The example above has only one service object, but in the real world, things can get more complicated. For example, what if you had hundreds of services, and half of them were related business actions, e.g., having a Follower service that followed another Twitter account? Honestly, I’d go insane if a folder contained 200 unique-looking files, so good thing there’s another pattern from the Rails Way that we can copy—I mean, use as inspiration: namespacing.
 
@@ -166,11 +171,12 @@ Now, since I’m the supreme overlord of this app, I’m going to create a manag
 
 Since this manager does nothing but manage, let’s make it a module and nest our service objects under this module. Our folder structure will now look like:
 
-services
-├── application_service.rb
-└── twitter_manager
-      ├── profile_follower.rb
-      └── tweet_creator.rb
+```
+services/application_service.rb
+services/twitter_manager/profile_follower.rb
+services/twitter_manager/tweet_creator.rb
+```
+
 And our service objects:
 
 ````ruby
@@ -190,7 +196,8 @@ end
 
 And our calls will now become ```TwitterManager::TweetCreator.call(arg)```, and ```TwitterManager::ProfileManager.call(arg)```.
 
-## Service Objects to Handle Database Operations
+---
+## SERVICE OBJECTS TO HANDLE DATABASE OPERATIONS
 
 The example above made API calls, but service objects can also be used when all the calls are to your database instead of an API. This is especially helpful if some business actions require multiple database updates wrapped in a transaction. For example, this sample code would use services to record a currency exchange taking place.
 
@@ -258,23 +265,24 @@ Return an Enum
 Return true or false
 This one is simple: If an action works as intended, return true; otherwise, return false:
 
-  ````ruby
-  def call
-    ...
-    return true if client.update(@message)
-    false
-  end
+````ruby
+def call
+  ...
+  return true if client.update(@message)
+  false
+end
   ````
+
 Return a Value
 If your service object fetches data from somewhere, you probably want to return that value:
 
-  ````ruby
-  def call
-    ...
-    return false unless exchange_rate
-    exchange_rate
-  end
-  ````
+````ruby
+def call
+  ...
+  return false unless exchange_rate
+  exchange_rate
+end
+````
 
 Respond with an Enum
 If your service object is a bit more complex, and you want to handle different scenarios, you could just add enums to control the flow of your services:
@@ -303,16 +311,16 @@ end
 
 And then in your app, you can use:
 
-    ````ruby
-    case ExchangeRecorder.call
-    when ExchangeRecorder::SUCCESS
-      foo
-    when ExchangeRecorder::FAILURE
-      bar
-    when ExchangeRecorder::PARTIAL_SUCCESS
-      baz
-    end
-    ````
+````ruby
+case ExchangeRecorder.call
+when ExchangeRecorder::SUCCESS
+  foo
+when ExchangeRecorder::FAILURE
+  bar
+when ExchangeRecorder::PARTIAL_SUCCESS
+  baz
+end
+````
 
 Shouldn’t I Put Service Objects in lib/services Instead of app/services?
 This is subjective. People’s opinions differ on where to put their service objects. Some people put them in lib/services, while some create app/services. I fall in the latter camp. Rails’ Getting Started Guide describes the lib/ folder as the place to put “extended modules for your application.”
@@ -364,16 +372,16 @@ No spam. Just great engineering posts.
 Rules for Writing Good Service Objects
 I have a four rules for creating service objects. These aren’t written in stone, and if you really want to break them, you can, but I will probably ask you to change it in code reviews unless your reasoning is sound.
 
-Rule 1: Only One Public Method per Service Object
+**Rule 1:** Only One Public Method per Service Object
 Service objects are single business actions. You can change the name of your public method if you like. I prefer using call, but Gitlab CE’s codebase calls it execute and other people may use perform. Use whatever you want—you could call it nermin for all I care. Just don’t create two public methods for a single service object. Break it into two objects if you need to.
 
-Rule 2: Name Service Objects Like Dumb Roles at a Company
+**Rule 2:** Name Service Objects Like Dumb Roles at a Company
 Service objects are single business actions. Imagine if you hired one person at the company to do that one job, what would you call them? If their job is to create tweets, call them TweetCreator. If their job is to read specific tweets, call them TweetReader.
 
-Rule 3: Don’t Create Generic Objects to Perform Multiple Actions
+**Rule 3:** Don’t Create Generic Objects to Perform Multiple Actions
 Service objects are single business actions. I broke the functionality into two pieces: TweetReader, and ProfileFollower. What I didn’t do is create a single generic object called TwitterHandler and dump all of the API functionality in there. Please don’t do this. This goes against the “business action” mindset and makes the service object look like the Twitter Fairy. If you want to share code among the business objects, just create a BaseTwitterManager object or module and mix that into your service objects.
 
-Rule 4: Handle Exceptions Inside the Service Object
+**Rule 4:** Handle Exceptions Inside the Service Object
 For the umpteenth time: Service objects are single business actions. I can’t say this enough. If you’ve got a person that reads tweets, they’ll either give you the tweet, or say, “This tweet doesn’t exist.” Similarly, don’t let your service object panic, jump on your controller’s desk, and tell it to halt all work because “Error!” Just return false and let the controller move on from there.
 
 Credits and Next Steps
