@@ -1,6 +1,5 @@
 # Build a RESTful JSON API With Rails 5 - Part One
 
-
 Rails is popularly known for building web applications. Chances are if you're reading this you've built a traditional server-rendered web application with Rails before. If not, I'd highly recommend going through the Getting Started with Rails page to familiarize yourself with the Rails framework before proceeding with this tutorial.
 
 As of version 5, Rails core now supports API only applications! In previous versions, we relied on an external gem: rails-api which has since been merged to core rails.
@@ -9,11 +8,11 @@ API only applications are slimmed down compared to traditional Rails web applica
 
 ---
 ## Table of Contents
-* [Prerequisites](#Prerequisites)
-* [Project Setup](#Project-Setup)
-* [Models](#Models)
-* [Controllers](#Controllers)
-* [Conclusion](#Conclusion)
+* [Prerequisites](#prerequisites)
+* [Project Setup](#project-setup)
+* [Models](#models)
+* [Controllers](#controllers)
+* [Conclusion](#conclusion)
 
 ---
 1. Start the application with a limited set of middleware
@@ -25,7 +24,7 @@ This works to generate an API-centric framework excluding functionality that wou
 In this three-part tutorial, we'll build a todo list API where users can manage their to-do lists and todo items.
 
 ---
-## Prerequisites
+### PREREQUISITES
 Before we begin, make sure you have ruby version >=2.2.2 and rails version 5.
 
 ````bash
@@ -52,7 +51,7 @@ $ gem update rails
 All good? Let's get started!
 
 ---
-### API Endpoints
+#### API Endpoints
 
 Our API will expose the following RESTful endpoints.
 
@@ -78,7 +77,7 @@ Part One will Cover:
 - TodoItems API
 
 ---
-## Project Setup
+### PROJECT SETUP
 
 Generate a new project todos-api by running:
 
@@ -89,7 +88,7 @@ $ rails new todos-api --api -T
 Note that we're using the --api argument to tell Rails that we want an API application and -T to exclude Minitest the default testing framework. Don't freak out, we're going to write tests. We'll be using RSpec instead to test our API. I find RSpec to be more expressive and easier to start with as compared to Minitest.
 
 ---
-## Dependencies
+#### Dependencies
 
 Let's take a moment to review the gems that we'll be using.
 
@@ -151,7 +150,7 @@ $ mkdir spec/factories
 ````
 
 ---
-## Configuration
+#### Configuration
 In spec/rails_helper.rb
 
 ````ruby
@@ -192,7 +191,7 @@ end
 Phew! That was a rather long. Good thing is, it's a smooth ride from here on out.
 
 ---
-## Models
+### MODELS
 
 Let's start by generating the Todo model
 
@@ -316,7 +315,7 @@ At this point run the tests again and...
 voila! All green.
 
 ---
-## Controllers
+### CONTROLLERS
 
 Now that our models are all setup, let's generate the controllers.
 
@@ -370,7 +369,7 @@ FactoryBot.define do
 end
 ````
 
-### Todo API
+#### Todo API
 
 ````ruby
 # spec/requests/todos_spec.rb
@@ -652,7 +651,7 @@ $ http DELETE :3000/todos/1
 
 You should see similar output.
 
-### TodoItems API
+#### TodoItems API
 
 ````ruby
 # spec/requests/items_spec.rb
@@ -853,7 +852,7 @@ $ http DELETE :3000/todos/2/items/1
 ````
 
 ---
-## Conclusion
+### CONCLUSION
 
 That's it for part one! At this point you should have learned how to:
 
@@ -863,6 +862,6 @@ That's it for part one! At this point you should have learned how to:
 - Make HTTP requests to an API with httpie.
 - In the next part, we'll cover authentication with JWT, pagination, and API versioning. Hope to see you there. Cheers!
 
-## Credits
+#### Credits
 
 [Austin Kabiru](https://scotch.io/tutorials/build-a-restful-json-api-with-rails-5-part-one)
