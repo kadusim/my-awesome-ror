@@ -9,16 +9,18 @@ API only applications are slimmed down compared to traditional Rails web applica
 
 ---
 ## Table of Contents
-- [Prerequisites](Prerequisites)
-- [Project Setup](Project Setup)
-- [Models](Models)
-- [Controllers](Controllers)
-- [Conclusion](Conclusion)
+* [Prerequisites](#Prerequisites)
+* [Project Setup](#Project-Setup)
+* [Models](#Models)
+* [Controllers](#Controllers)
+* [Conclusion](#Conclusion)
 
-- Start the application with a limited set of middleware
-- Make the ApplicationController inherit from ActionController::API instead of ActionController::Base
-- Skip generation of view files
-- This works to generate an API-centric framework excluding functionality that would otherwise be unused and unnecessary.
+---
+1. Start the application with a limited set of middleware
+2. Make the ApplicationController inherit from ActionController::API instead of ActionController::Base
+3. Skip generation of view files
+
+This works to generate an API-centric framework excluding functionality that would otherwise be unused and unnecessary.
 
 In this three-part tutorial, we'll build a todo list API where users can manage their to-do lists and todo items.
 
