@@ -138,7 +138,7 @@ $ http :3000/todos Accept:'application/vnd.todos.v1+json' Authorization:'ey...AW
 $ http :3000/todos Accept:'application/vnd.todos.v2+json' Authorization:'ey...AWH3FNTd3T0jMB7HnLw2bYQbK0g'
 ````
 
-![b2cZn4ZoSM2fNpuGIzxQ_Screen Shot 2017-03-13 at 15](b2cZn4ZoSM2fNpuGIzxQ_Screen Shot 2017-03-13 at 15.webp)
+![b2cZn4ZoSM2fNpuGIzxQ_ScreenShot2017-03-13at15](b2cZn4ZoSM2fNpuGIzxQ_ScreenShot2017-03-13at15.webp)
 
 In case we attempt to access a nonexistent version, the API will default to v1 since we set it as the default version. For testing purposes, let's define v2.
 
@@ -186,7 +186,7 @@ $ http :3000/todos Accept:'application/vnd.todos.v1+json' Authorization:'eyJ0e..
 $ http :3000/todos Accept:'application/vnd.todos.v2+json' Authorization:'eyJ0e...Lw2bYQbK0g'
 ````
 
-![pkdeo12WR6W9GLd9VZQt_Screen Shot 2017-03-13 at 17.webp](pkdeo12WR6W9GLd9VZQt_Screen Shot 2017-03-13 at 17.webp)
+![pkdeo12WR6W9GLd9VZQt_ScreenShot2017-03-13at17.webp](pkdeo12WR6W9GLd9VZQt_ScreenShot2017-03-13at17.webp)
 
 Voila! Our API responds to version 2!
 
@@ -239,7 +239,7 @@ $ http POST :3000/todos/1/items name='Listen to Don Giovanni' Accept:'applicatio
 $ http :3000/todos Accept:'application/vnd.todos.v1+json' Authorization:'ey...HnLw2bYQbK0g'
 ````
 
-![PJqCsEQaSpqAYNKxBkGl_Screen Shot 2017-03-13 at 19](PJqCsEQaSpqAYNKxBkGl_Screen Shot 2017-03-13 at 19.webp)
+![PJqCsEQaSpqAYNKxBkGl_ScreenShot2017-03-13at19](PJqCsEQaSpqAYNKxBkGl_ScreenShot2017-03-13at19.webp)
 
 This is great. One request to rule them all!
 
@@ -292,7 +292,7 @@ $ http :3000/todos page==1 Accept:'application/vnd.todos.v1+json' Authorization:
 $ http :3000/todos page==2 Accept:'application/vnd.todos.v1+json' Authorization:'eyJ0...nLw2bYQbK0g'
 ````
 
-![l54aKj7eTn2UD6sMuZLC_Screen Shot 2017-03-13 at 21](l54aKj7eTn2UD6sMuZLC_Screen Shot 2017-03-13 at 21.webp)
+![l54aKj7eTn2UD6sMuZLC_ScreenShot2017-03-13at21](l54aKj7eTn2UD6sMuZLC_ScreenShot2017-03-13at21.webp)
 
 The page number is part of the query string. Note that when we request the second page, we get an empty array. This is because we don't have more that 20 records in the database. Let's seed some test data into the database.
 
@@ -322,7 +322,7 @@ Seed the database by running:
 $ rake db:seed
 ````
 
-![I5B2pQqsRlCDdCb8Cr4o_Screen Shot 2017-03-27 at 00](I5B2pQqsRlCDdCb8Cr4o_Screen Shot 2017-03-27 at 00.webp)
+![I5B2pQqsRlCDdCb8Cr4o_ScreenShot2017-03-27at00](I5B2pQqsRlCDdCb8Cr4o_ScreenShot2017-03-27at00.webp)
 
 Awesome, fire up the server and rerun the HTTP requests. Since we have test data, we're able to see data from different pages.
 

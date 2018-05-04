@@ -63,6 +63,8 @@ end
 ````
 Run the tests and...
 
+![vkDD0WFtTzW3Mr8w6qgm_ScreenShot2017-02-24at16](vkDD0WFtTzW3Mr8w6qgm_ScreenShot2017-02-24at16.webp)
+
 User specs are failing as expected. Let's fix that by implementing the user model.
 
 ````ruby
@@ -351,6 +353,8 @@ end
 
 At this point, if you attempt to run the tests, You should get a load error. You guessed it, this is because we haven't defined the class. Let's do just that!
 
+![MqvKPypbS12XSWa2G5b5_ScreenShot2017-03-05at15](MqvKPypbS12XSWa2G5b5_ScreenShot2017-03-05at15.webp)
+
 ````ruby
 # app/auth/authorize_api_request.rb
 class AuthorizeApiRequest
@@ -442,6 +446,8 @@ Run the auth specs and everything should be green.
 $ bundle exec rspec spec/auth -fd
 ````
 
+![8jzmOTuTRQGuDJ31HXPZ_ScreenShot2017-03-05at16](8jzmOTuTRQGuDJ31HXPZ_ScreenShot2017-03-05at16.webp)
+
 ---
 ### AUTHENTICATE USER
 
@@ -527,6 +533,8 @@ The AuthenticateUser service accepts a user email and password, checks if they a
 ````bash
 $ bundle exec rspec spec/auth -fd
 ````
+
+![8jzmOTuTRQGuDJ31HXPZ_ScreenShot2017-03-05at162](8jzmOTuTRQGuDJ31HXPZ_ScreenShot2017-03-05at162.webp)
 
 ---
 ### AUTHENTICATION CONTROLLER
@@ -715,6 +723,8 @@ end
 The users controller attempts to create a user and returns a JSON response with the result. We use Active Record's create! method so that in the event there's an error, an exception will be raised and handled in the exception handler.
 
 One more thing, we've wired up the user authentication bit but our API is still open; it does not authorize requests with a token.
+
+![CqPVXOI6QCOrxrT4WeQh_ScreenShot2017-03-05at23](CqPVXOI6QCOrxrT4WeQh_ScreenShot2017-03-05at23.webp)
 
 To fix this, we have to make sure that on every request (except authentication) our API checks for a valid token. To achieve this, we'll implement a callback in the application controller that authenticates every request. Since all controllers inherit from application controller, it will be propagated to all controllers.
 
@@ -966,6 +976,8 @@ end
 
 Awesome, our specs are now up to date! Phew!
 
+![GX4aeTDXQQyISN2gAoOa_ScreenShot2017-03-06at15.09.34](GX4aeTDXQQyISN2gAoOa_ScreenShot2017-03-06at15.09.34.jpg)
+
 Let's fire up the server for some manual testing.
 
 ````bash
@@ -983,6 +995,8 @@ $ http POST :3000/todos title=Beethoven \
 $ http :3000/todos \
 Authorization:'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE0ODg5MDEyNjR9.7txvLgDzFdX5NIUGYb3W45oNIXinwB_ITu3jdlG5Dds'
 ````
+
+![bdLk8OgqSDCbbwSVpOCw_ScreenShot2017-03-06at18](bdLk8OgqSDCbbwSVpOCw_ScreenShot2017-03-06at18.webp)
 
 ---
 ### CONCLUSION
