@@ -102,9 +102,8 @@ All good? Great! Let's set them up. In your Gemfile:
 
 Add rspec-rails to both the :development and :test groups.
 
-Gemfile
-
 ````ruby
+# Gemfile
 group :development, :test do
   gem 'rspec-rails', '~> 3.5'
 end
@@ -114,9 +113,8 @@ This is a handy shorthand to include a gem in multiple environments.
 
 Add factory_bot_rails, shoulda_matchers, faker and database_cleaner to the :test group.
 
-Gemfile
-
 ````ruby
+# Gemfile
 group :test do
   gem 'factory_bot_rails', '~> 4.0'
   gem 'shoulda-matchers', '~> 3.1'

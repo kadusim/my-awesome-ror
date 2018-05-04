@@ -4,26 +4,33 @@ In part one of this tutorial, we managed to generate an API-only Rails applicati
 
 In this part of the tutorial, we'll implement token-based authentication with JWT (JSON Web Tokens). In this implementation, we'll proceed with our approach of using TDD principles to add the authentication features.
 
-Authentication
+#### Authentication
+
 Our API should be able to support user accounts with each user having the ability managing their own resources. We'll adapt Hristo's approach with notable alterations.
 
-Table of Contents
- Json Web Token
- Authorize Api Request
- Authenticate User
- Authentication Controller
- Conclusion
+---
+## Table of Contents  
+* [Json Web Token](#json-web-token)
+* [Authorize Api Request](#authorize-api-request)
+* [Authenticate User](#authenticate-user)
+* [Authentication Controller](#authentication-controller)
+* [Conclusion](#conclusion)
+
 First, generate a user model.
 
+````bash
 $ rails g model User name:string email:string password_digest:string
 # run the migrations
 $ rails db:migrate
 # make sure the test environment is ready
 $ rails db:test:prepare
+````
+
 If you're wondering why we have password_digest field instead of a normal password field, hang tight, we'll go over this soon enough. :)
 
 Let's define the user model spec.
 
+````ruby
 # spec/models/user_spec.rb
 require 'rails_helper'
 
@@ -38,10 +45,13 @@ RSpec.describe User, type: :model do
   it { should validate_presence_of(:email) }
   it { should validate_presence_of(:password_digest) }
 end
+````
+
 Users should be able to manage their own todo lists. Thus, the user model should have a one to many relationship with the todo model. We also want to make sure that on every user account creation we have all the required credentials.
 
 Let's add a user factory. This will be used by our test suite to create test users.
 
+````ruby
 # spec/factories/users.rb
 FactoryBot.define do
   factory :user do
@@ -50,13 +60,12 @@ FactoryBot.define do
     password 'foobar'
   end
 end
+````
 Run the tests and...
 
-
-
-Related Course: Getting Started with JavaScript for Web Development
 User specs are failing as expected. Let's fix that by implementing the user model.
 
+````ruby
 # app/models/user.rb
 class User < ApplicationRecord
   # encrypt password
@@ -67,34 +76,50 @@ class User < ApplicationRecord
   # Validations
   validates_presence_of :name, :email, :password_digest
 end
+````
+
 Our user model defines a 1:m relationship with the todo model also adds field validations. Note that user model calls the method has_secure_password, this adds methods to authenticate against a bcrypt password. It's this mechanism that requires us to have a password_digest attribute. Thus, we need to have the bcrypt gem as a dependency.
 
-
+````ruby
 # Gemfile
 # [...]
 # Use ActiveModel has_secure_password
 gem 'bcrypt', '~> 3.1.7'
 # [...]
+````
+
 Install the gem and run the tests.
 
+````bash
 $ bundle install
 $ bundle exec rspec
+````
+
 All green!
 
 Model's all set up to save the users. We're going to wire up the rest of the authentication system by adding the following service classes:
 
-JsonWebToken - Encode and decode jwt tokens
-AuthorizeApiRequest - Authorize each API request
-AuthenticateUser - Authenticate users
-AuthenticationController - Orchestrate authentication process
-# Json Web Token
+* JsonWebToken - Encode and decode jwt tokens
+* AuthorizeApiRequest - Authorize each API request
+* AuthenticateUser - Authenticate users
+* AuthenticationController - Orchestrate authentication process
+
+---
+### JSON WEB TOKEN
+
 We're going to implement token based authentication. We'll make use of the jwt gem to manage JSON web tokens(jwt). Let's add this to the Gemfile and install it.
 
+````ruby
 # Gemfile
 # [...]
 gem 'jwt'
 # [...]
+````
+
+````bash
 $ bundle install
+````
+
 Our class will live in the lib directory since it's not domain specific; if we were to move it to a different application it should work with minimal configuration. There's a small caveat, though...
 
 As of Rails 5, autoloading is disabled in production because of thread safety.
@@ -103,12 +128,15 @@ This is a huge concern for us since lib is part of auto-load paths. To counter t
 
 Great, let's do this! Add the lib directory and the jwt class file.
 
-
+````bash
 # create custom lib
 $ mkdir app/lib
 $ touch app/lib/json_web_token.rb
+````
+
 Define jwt singleton.
 
+````ruby
 # app/lib/json_web_token.rb
 class JsonWebToken
   # secret to encode and decode token
@@ -131,8 +159,11 @@ class JsonWebToken
     raise ExceptionHandler::InvalidToken, e.message
   end
 end
+````
+
 This singleton wraps JWT to provide token encoding and decoding methods. The encode method will be responsible for creating tokens based on a payload (user id) and expiration period. Since every Rails application has a unique secret key, we'll use that as our secret to sign tokens. The decode method, on the other hand, accepts a token and attempts to decode it using the same secret used in encoding. In the event decoding fails, be it due to expiration or validation, JWT will raise respective exceptions which will be caught and handled by the Exception Handler module.
 
+````ruby
 module ExceptionHandler
   extend ActiveSupport::Concern
 
@@ -165,22 +196,29 @@ module ExceptionHandler
     json_response({ message: e.message }, :unauthorized)
   end
 end
+````
+
 We've defined custom Standard Error sub-classes to help handle exceptions raised. By defining error classes as sub-classes of standard error, we're able to rescue_from them once raised.
 
-# Authorize Api Request
+---
+### AUTHORIZE API REQUEST
+
 This class will be responsible for authorizing all API requests making sure that all requests have a valid token and user payload.
 
 Since this is an authentication service class, it'll live in app/auth.
 
+````bash
 # create auth folder to house auth services
 $ mkdir app/auth
 $ touch app/auth/authorize_api_request.rb
 # Create corresponding spec files
 $ mkdir spec/auth
 $ touch spec/auth/authorize_api_request_spec.rb
+````
+
 Let's define its specifications
 
-
+````ruby
 # spec/auth/authorize_api_request_spec.rb
 require 'rails_helper'
 
@@ -254,14 +292,21 @@ RSpec.describe AuthorizeApiRequest do
     end
   end
 end
+````
+
 The AuthorizeApiRequest service should have an entry method call that returns a valid user object when the request is valid and raises an error when invalid. Note that we also have a couple of test helper methods;
 
-token_generator - generate test token
-expired_token_generator - generate expired token
+- token_generator - generate test token
+- expired_token_generator - generate expired token
+
 We'll define these helpers in spec/support.
 
+````bash
 # create module file
 $ touch spec/support/controller_spec_helper.rb
+````
+
+````ruby
 # spec/support/controller_spec_helper.rb
 module ControllerSpecHelper
   # generate tokens from user id
@@ -290,8 +335,11 @@ module ControllerSpecHelper
     }
   end
 end
+````
+
 We also have additional test helpers to generate headers. In order to make use of these helper methods, we have to include the module in rails helper. While we're here let's also include RequestSpecHelper to all types (not just requests); remove type: :request. This way, we'll be able to reuse our handy json helper.
 
+````ruby
 RSpec.configure do |config|
   # [...]
   # previously `config.include RequestSpecHelper, type: :request`
@@ -299,11 +347,11 @@ RSpec.configure do |config|
   config.include ControllerSpecHelper
   # [...]
 end
+````
+
 At this point, if you attempt to run the tests, You should get a load error. You guessed it, this is because we haven't defined the class. Let's do just that!
 
-
-
-
+````ruby
 # app/auth/authorize_api_request.rb
 class AuthorizeApiRequest
   def initialize(headers = {})
@@ -347,8 +395,11 @@ class AuthorizeApiRequest
       raise(ExceptionHandler::MissingToken, Message.missing_token)
   end
 end
+````
+
 The AuthorizeApiRequest service gets the token from the authorization headers, attempts to decode it to return a valid user object. We also have a singleton Message to house all our messages; this an easier way to manage our application messages. We'll define it in app/lib since it's non-domain-specific.
 
+````ruby
 # app/lib/message.rb
 class Message
   def self.not_found(record = 'record')
@@ -383,22 +434,30 @@ class Message
     'Sorry, your token has expired. Please login to continue.'
   end
 end
+````
+
 Run the auth specs and everything should be green.
 
+````bash
 $ bundle exec rspec spec/auth -fd
+````
 
+---
+### AUTHENTICATE USER
 
-# Authenticate User
 This class will be responsible for authenticating users via email and password.
 
 Since this is also an authentication service class, it'll live in app/auth.
 
+````bash
 $ touch app/auth/authenticate_user.rb
 # Create corresponding spec file
 $ touch spec/auth/authenticate_user_spec.rb
+````
+
 Let's define its specifications.
 
-
+````ruby
 # spec/auth/authenticate_user_spec.rb
 require 'rails_helper'
 
@@ -432,8 +491,11 @@ RSpec.describe AuthenticateUser do
     end
   end
 end
+````
+
 The AuthenticateUser service also has an entry point #call. It should return a token when user credentials are valid and raise an error when they're not. Running the auth specs and they should fail with a load error. Let's go ahead and implement the class.
 
+````ruby
 # app/auth/authenticate_user.rb
 class AuthenticateUser
   def initialize(email, password)
@@ -458,19 +520,27 @@ class AuthenticateUser
     raise(ExceptionHandler::AuthenticationError, Message.invalid_credentials)
   end
 end
+````
+
 The AuthenticateUser service accepts a user email and password, checks if they are valid and then creates a token with the user id as the payload.
 
+````bash
 $ bundle exec rspec spec/auth -fd
+````
 
+---
+### AUTHENTICATION CONTROLLER
 
-# Authentication Controller
 This controller will be responsible for orchestrating the authentication process making use of the auth service we have just created.
 
+````bash
 # generate the Authentication Controller
 $ rails g controller Authentication
+````
+
 First thing's first. Tests!
 
-
+````ruby
 # spec/requests/authentication_spec.rb
 require 'rails_helper'
 
@@ -517,8 +587,11 @@ RSpec.describe 'Authentication', type: :request do
     end
   end
 end
+````
+
 The authentication controller should expose an /auth/login endpoint that accepts user credentials and returns a JSON response with the result.
 
+````ruby
 # app/controllers/authentication_controller.rb
 class AuthenticationController < ApplicationController
   # return auth token once user is authenticated
@@ -534,22 +607,30 @@ class AuthenticationController < ApplicationController
     params.permit(:email, :password)
   end
 end
+````
+
 Notice how slim the authentication controller is, we have our service architecture to thank for that. Instead, we make use of the authentication controller to piece everything together... to control authentication. We also need to add routing for authentication action.
 
+````ruby
 # config/routes.rb
 Rails.application.routes.draw do
   # [...]
   post 'auth/login', to: 'authentication#authenticate'
 end
+````
+
 In order to have users to authenticate in the first place, we need to have them signup first. This will be handled by the users controller.
 
+````bash
 # generate users controller
 $ rails g controller Users
 # generate users request spec
 $ touch spec/requests/users_spec.rb
+````
+
 User signup spec.
 
-
+````ruby
 # spec/requests/users_spec.rb
 require 'rails_helper'
 
@@ -592,15 +673,21 @@ RSpec.describe 'Users API', type: :request do
     end
   end
 end
+````
+
 The user controller should expose a /signup endpoint that accepts user information and returns a JSON response with the result. Add the signup route.
 
+````ruby
 # config/routes.rb
 Rails.application.routes.draw do
   # [...]
   post 'signup', to: 'users#create'
 end
+````
+
 And then implement the controller.
 
+````ruby
 # app/controllers/users_controller.rb
 class UsersController < ApplicationController
   # POST /signup
@@ -623,14 +710,15 @@ class UsersController < ApplicationController
     )
   end
 end
+````
+
 The users controller attempts to create a user and returns a JSON response with the result. We use Active Record's create! method so that in the event there's an error, an exception will be raised and handled in the exception handler.
 
 One more thing, we've wired up the user authentication bit but our API is still open; it does not authorize requests with a token.
 
-
-
 To fix this, we have to make sure that on every request (except authentication) our API checks for a valid token. To achieve this, we'll implement a callback in the application controller that authenticates every request. Since all controllers inherit from application controller, it will be propagated to all controllers.
 
+````ruby
 # spec/controllers/application_controller_spec.rb
 require "rails_helper"
 
@@ -663,9 +751,11 @@ RSpec.describe ApplicationController, type: :controller do
     end
   end
 end
+````
+
 Cool, now that we have the tests, let's implement the authorization.
 
-
+````ruby
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::API
   include Response
@@ -682,6 +772,8 @@ class ApplicationController < ActionController::API
     @current_user = (AuthorizeApiRequest.new(request.headers).call)[:user]
   end
 end
+````
+
 On every request, the application will verify the request by calling the request authorization service. If the request is authorized, it will set the current user object to be used in the other controllers.
 
 Notice how we don't have lots of guard clauses and conditionals in our controllers, this is because of our error handling implementation.
@@ -690,22 +782,29 @@ Let's remember that when signing up and authenticating a user we won't need a to
 
 First, the authetication action.
 
+````ruby
 # app/controllers/authentication_controller.rb
 class AuthenticationController < ApplicationController
   skip_before_action :authorize_request, only: :authenticate
   # [...]
 end
+````
+
 Then the user signup action.
 
+````ruby
 # app/controllers/users_controller.rb
 class UsersController < ApplicationController
   skip_before_action :authorize_request, only: :create
   # [...]
 end
+````
+
 Run the tests and you'll notice, our Todo and TodoItems API is failing. Don't fret, this is exactly what we want; means our request authorization is working as intended. Let's update the API to cater for this.
 
 In the Todos request spec, we'll make partial update all our requests to have authorization headers and a JSON payload.
 
+````ruby
 # spec/requests/todos_spec.rb
 require 'rails_helper'
 
@@ -770,9 +869,11 @@ RSpec.describe 'Todos API', type: :request do
     # [...]
   end
 end
+````
+
 Our todos controller doesn't know about users yet.Let's fix that.
 
-
+````ruby
 # app/controllers/todos_controller.rb
 class TodosController < ApplicationController
   # [...]
@@ -798,8 +899,11 @@ class TodosController < ApplicationController
   end
   # [...]
 end
+````
+
 Let's update the Items API with the same.
 
+````ruby
 # spec/requests/items_spec.rb
 require 'rails_helper'
 
@@ -858,12 +962,13 @@ RSpec.describe 'Items API' do
     # [...]
   end
 end
+````
+
 Awesome, our specs are now up to date! Phew!
-
-
 
 Let's fire up the server for some manual testing.
 
+````bash
 # Attempt to access API without a token
 $ http :3000/todos
 # Signup a new user - get token from here
@@ -877,9 +982,11 @@ $ http POST :3000/todos title=Beethoven \
 # Get create todos
 $ http :3000/todos \
 Authorization:'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE0ODg5MDEyNjR9.7txvLgDzFdX5NIUGYb3W45oNIXinwB_ITu3jdlG5Dds'
+````
 
+---
+### CONCLUSION
 
-# Conclusion
 That's it for part two! At this point, you should have learned how to implement token based authentication with JWT.
 
 In the next part of this tutorial, we'll wrap up with API versioning, pagination and serialization. As always, hope to see you there. Cheers!

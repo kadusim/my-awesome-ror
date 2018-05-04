@@ -4,13 +4,15 @@ In part two of this tutorial, we added token-based authentication with JWT (JSON
 
 In this final part of the series, we'll wrap with the following:
 
-Versioning
-Serializers
-Pagination
+- Versioning
+- Serializers
+- Pagination
+
 # Versioning
 When building an API whether public or internal facing, it's highly recommended that you version it. This might seem trivial when you have total control over all clients. However, when the API is public facing, you want to establish a contract with your clients. Every breaking change should be a new version. Convincing enough? Great, let's do this!
 
-Table of Contents
+---
+## Table of Contents
  Versioning
  Serializers
 Pagination
