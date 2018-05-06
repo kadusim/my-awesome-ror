@@ -245,6 +245,8 @@ Looks good? Let's run the migrations.
 $ rails db:migrate
 ````
 
+![YW1BZHrBS3OEAz1h4wt7_ScreenShot2017-01-12at15](YW1BZHrBS3OEAz1h4wt7_ScreenShot2017-01-12at15.webp)
+
 We're Test Driven, let's write the model specs first.
 
 ````ruby
@@ -286,6 +288,8 @@ Let's execute the specs by running:
 $ bundle exec rspec
 ````
 
+![r7oqTvuTPu5NjpQHGPhb_ScreenShot2017-01-12at15](r7oqTvuTPu5NjpQHGPhb_ScreenShot2017-01-12at15.webp)
+
 And to no surprise, we have only one test passing and four failures. Let's go ahead and fix the failures.
 
 ````ruby
@@ -309,6 +313,8 @@ end
 ````
 
 At this point run the tests again and...
+
+![1rO6hS5SQPeQSz0owQKq_ScreenShot2017-01-12at15](1rO6hS5SQPeQSz0owQKq_ScreenShot2017-01-12at15.webp)
 
 voila! All green.
 
@@ -515,6 +521,8 @@ end
 
 Run the tests.
 
+![D6FS2LBETfVW9eiBGVQ7_ScreenShot2017-01-12at16](D6FS2LBETfVW9eiBGVQ7_ScreenShot2017-01-12at16.webp)
+
 We get failing routing errors. This is because we haven't defined the routes yet. Go ahead and define them in config/routes.rb.
 
 ````ruby
@@ -628,6 +636,8 @@ end
 
 Run the tests and everything's all green!
 
+![7HP1X9GqShrGrvR84htw_ScreenShot2017-01-12at17](7HP1X9GqShrGrvR84htw_ScreenShot2017-01-12at17.webp)
+
 Let's fire up the server for some good old manual testing.
 
 ````bash
@@ -648,6 +658,8 @@ $ http DELETE :3000/todos/1
 ````
 
 You should see similar output.
+
+![YL1abrSLQZ2HDOMxwdM3_ScreenShot2017-01-12at20](YL1abrSLQZ2HDOMxwdM3_ScreenShot2017-01-12at20.webp)
 
 #### TodoItems API
 
@@ -836,6 +848,8 @@ end
 
 Run the tests.
 
+![iSplzkBJQcBhoFtcVPdN_ScreenShot2017-01-12at20](iSplzkBJQcBhoFtcVPdN_ScreenShot2017-01-12at20.webp)
+
 Run some manual tests for the todo items API:
 
 ````bash
@@ -848,6 +862,8 @@ $ http PUT :3000/todos/2/items/1 done=true
 # DELETE /todos/:todo_id/items/1
 $ http DELETE :3000/todos/2/items/1
 ````
+
+![h6FaJ7NSQpyTC1a0p8lz_ScreenShot2017-01-12at21](h6FaJ7NSQpyTC1a0p8lz_ScreenShot2017-01-12at21.webp)
 
 ---
 ### CONCLUSION
