@@ -3,6 +3,7 @@
 * [Design Patterns in Ruby](#design-patterns-in-ruby)
 * [Rails Service Objects: A Comprehensive Guide](#rails-service-objects)
 * [Build a RESTful JSON API With Rails 5](#build-a-restful-json-api-with-rails-5)
+* [Real-time Notifications com rails 5.1](#real-time-notifications-com-rails-5.1)
 
 ---
 ### DESIGN PATTERNS IN RUBY
@@ -21,3 +22,9 @@ Writing clean service objects
 
 In this three-part tutorial, we'll build a todo list API where users can manage their to-do lists and todo items.
 > by [Austin Kabiru](https://scotch.io/tutorials/build-a-restful-json-api-with-rails-5-part-one)
+
+---
+### REAL-TIME NOTIFICATIONS COM RAILS 5.1
+
+Utitlizando Websockets com ActionCable.
+> by [Léo Rocha](https://medium.com/@lorocha/real-time-notifications-com-rails-5-1-2761a40f7a1f)
