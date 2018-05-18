@@ -4,6 +4,7 @@
 * [Rails Service Objects: A Comprehensive Guide](#rails-service-objects)
 * [Build a RESTful JSON API With Rails 5](#build-a-restful-json-api-with-rails-5)
 * [Real-time Notifications com rails 5.1](#real-time-notifications-com-rails-5.1)
+* [The Ultimate Intermediate Ruby on Rails](#the-ultimate-intermediate-ruby-on-rails)
 
 ---
 ### DESIGN PATTERNS IN RUBY
@@ -28,3 +29,9 @@ In this three-part tutorial, we'll build a todo list API where users can manage 
 
 Utitlizando Websockets com ActionCable.
 > by [Léo Rocha](https://medium.com/@lorocha/real-time-notifications-com-rails-5-1-2761a40f7a1f)
+
+---
+### THE ULTIMATE INTERMEDIATE RUBY ON RAILS 
+
+Tutorial: Let’s Create an Entire App!
+> by [Domantas G](https://medium.freecodecamp.org/lets-create-an-intermediate-level-ruby-on-rails-application-d7c6e997c63f)
